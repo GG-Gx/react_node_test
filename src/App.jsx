@@ -86,6 +86,28 @@ const ProtectedRoute = ({ children, requiredRole }) => {
 };
 
 /**
+ * Root Route Handler Component
+ * Determines whether to show auth pages or dashboard based on authentication status
+ */
+const RootRouteHandler = () => {
+  const { user } = useAuth();
+  
+  // Check if user is authenticated
+  const isAuthenticated = !!user || !!localStorage.getItem("token");
+  
+  if (!isAuthenticated) {
+    // Not authenticated - show login page by default
+    return <Login />;
+  }
+  
+  // User is authenticated - redirect to appropriate dashboard
+  const userRole = localStorage.getItem("userRole");
+  const redirectPath = userRole === "admin" ? "/admin/dashboard" : "/user/dashboard";
+  
+  return <Navigate to={redirectPath} replace />;
+};
+
+/**
  * Main App Component
  * 
  * Defines the application's routing structure and wraps the app with necessary providers.
@@ -100,12 +122,17 @@ function App() {
             
             <main className="flex-grow">
               <Routes>
-                {/* Public Routes */}
-                <Route path="/" element={<Landing />} />
+                {/* Root Route - Login first, then redirect to dashboard */}
+                <Route path="/" element={<RootRouteHandler />} />
+                
+                {/* Authentication Routes */}
                 <Route path="/login" element={<Login />} />
                 <Route path="/signup" element={<Signup />} />
                 <Route path="/forgot-password" element={<ForgotPassword />} />
                 <Route path="/reset-password" element={<ResetPassword />} />
+                
+                {/* Landing page (now accessible only when needed) */}
+                <Route path="/landing" element={<Landing />} />
                 
                 {/* Protected Admin Routes */}
                 <Route 
@@ -215,8 +242,8 @@ function App() {
                   } 
                 />
                 
-                {/* Fallback Route - Redirect to landing page */}
-                <Route path="*" element={<Navigate to="/" replace />} />
+                {/* Fallback Route - Redirect to login for unauthenticated, or appropriate dashboard */}
+                <Route path="*" element={<RootRouteHandler />} />
               </Routes>
             </main>
             

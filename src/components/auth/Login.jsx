@@ -232,10 +232,10 @@ const Login = () => {
           </div>
           <div>
             <Link
-              to="/"
+              to="/landing"
               className="text-gray-500 text-sm hover:underline"
             >
-              Back to Home
+              About TaskFlow
             </Link>
           </div>
         </div>

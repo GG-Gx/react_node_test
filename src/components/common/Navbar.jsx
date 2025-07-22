@@ -8,7 +8,7 @@ const Navbar = () => {
   const { logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const hideProfileRoutes = ["/", "/login", "/signup"];
+  const hideProfileRoutes = ["/login", "/signup", "/forgot-password", "/reset-password"];
 
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [taskListOpen, setTaskListOpen] = useState(false);
@@ -57,6 +57,7 @@ const Navbar = () => {
       // Remove the correct profile from storage
       localStorage.removeItem(isAdminPortal ? "adminProfile" : "userProfile");
 
+      // Redirect to root (which will show login page for unauthenticated users)
       navigate("/");
     } catch (err) {
       console.error("Logout failed:", err);
@@ -65,6 +66,15 @@ const Navbar = () => {
 
   const handleLogoClick = (e) => {
     e.preventDefault();
+    
+    // Check if user is authenticated
+    const isAuthenticated = !!localStorage.getItem("token");
+    
+    if (!isAuthenticated) {
+      // If not authenticated, redirect to login
+      navigate("/");
+      return;
+    }
 
     setTimeout(() => {
       const isAdminPortal = location.pathname.startsWith("/admin");
