@@ -8,21 +8,32 @@ const Navbar = () => {
   const { logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const hideProfileRoutes = ["/login", "/signup", "/forgot-password", "/reset-password"];
+  const hideProfileRoutes = [
+    "/login",
+    "/signup",
+    "/forgot-password",
+    "/reset-password",
+  ];
 
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [taskListOpen, setTaskListOpen] = useState(false);
   const dropdownRef = useRef(null);
   const taskListRef = useRef(null);
-  const [profile, setProfile] = useState({ name: "User", profilePic: "", role: "user" });
+  const [profile, setProfile] = useState({
+    name: "User",
+    profilePic: "",
+    role: "user",
+  });
 
   useEffect(() => {
     // Check if user is in admin or user portal
     const isAdminPortal = location.pathname.startsWith("/admin");
 
     // Load correct profile from localStorage
-    const storedProfile = JSON.parse(localStorage.getItem(isAdminPortal ? "adminProfile" : "userProfile"));
-    
+    const storedProfile = JSON.parse(
+      localStorage.getItem(isAdminPortal ? "adminProfile" : "userProfile")
+    );
+
     if (storedProfile) {
       setProfile({
         name: storedProfile.name || "User",
@@ -42,7 +53,7 @@ const Navbar = () => {
         setTaskListOpen(false);
       }
     }
-    
+
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
@@ -66,10 +77,10 @@ const Navbar = () => {
 
   const handleLogoClick = (e) => {
     e.preventDefault();
-    
+
     // Check if user is authenticated
     const isAuthenticated = !!localStorage.getItem("token");
-    
+
     if (!isAuthenticated) {
       // If not authenticated, redirect to login
       navigate("/");
@@ -103,7 +114,11 @@ const Navbar = () => {
         onClick={handleLogoClick}
         className="flex items-center text-3xl font-bold tracking-wide hover:opacity-70 transition"
       >
-        <img src="/app_icon.png" alt="TaskFlow Logo" className="w-12 h-12 rounded-full mr-2" />
+        <img
+          src="/app_icon.png"
+          alt="TaskFlow Logo"
+          className="w-12 h-12 rounded-full mr-2"
+        />
         TaskFlow
       </Link>
 
@@ -155,7 +170,11 @@ const Navbar = () => {
                 <ul className="text-gray-700">
                   <li>
                     <Link
-                      to={profile.role === "admin" ? "/admin/profile" : "/user/profile"}
+                      to={
+                        profile.role === "admin"
+                          ? "/admin/profile"
+                          : "/user/profile"
+                      }
                       className="block px-4 py-2 hover:bg-gray-200 transition"
                       onClick={() => setDropdownOpen(false)}
                     >

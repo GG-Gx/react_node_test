@@ -1,17 +1,17 @@
 /**
  * Login Component
- * 
+ *
  * A comprehensive authentication component that handles user login with proper
  * validation, error handling, and state management. Implements localStorage-based
  * authentication for persistent user sessions across browser refreshes.
- * 
+ *
  * Features:
  * - Supports both default and custom user accounts
  * - Persists authentication state across browser sessions
  * - Provides clear error feedback and loading states
  * - Implements role-based redirection
  * - Logs authentication events for admin tracking
- * 
+ *
  * @author Senior Full-Stack Engineer
  * @version 2.0.0
  */
@@ -19,7 +19,12 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
-import { FaLock, FaEnvelope, FaExclamationCircle, FaSpinner } from "react-icons/fa";
+import {
+  FaLock,
+  FaEnvelope,
+  FaExclamationCircle,
+  FaSpinner,
+} from "react-icons/fa";
 
 const Login = () => {
   // State management with proper initialization
@@ -27,12 +32,12 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  
+
   // Hooks initialization
   const { login } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  
+
   // Extract role from location state or default to user
   const role = location.state?.role || "user";
   const from = location.state?.from || "/";
@@ -52,45 +57,60 @@ const Login = () => {
   /**
    * Handles form submission and authentication
    * Implements localStorage-based authentication with support for custom users
-   * 
+   *
    * @param {Event} e - The form submission event
    */
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     // Input validation
     if (!email.trim() || !password.trim()) {
       setError("Email and password are required");
       return;
     }
-    
+
     // Reset previous errors
     setError("");
     setLoading(true);
-    
+
     try {
       // Simulate network latency for realistic UX
-      await new Promise(resolve => setTimeout(resolve, 800));
-      
+      await new Promise((resolve) => setTimeout(resolve, 800));
+
       // Get stored users from localStorage or initialize with default users
-      const storedUsers = JSON.parse(localStorage.getItem('users') || JSON.stringify([
-        { email: 'admin@example.com', password: 'password123', role: 'admin', userId: 'admin-123' },
-        { email: 'user@example.com', password: 'password123', role: 'user', userId: 'user-456' }
-      ]));
-      
+      const storedUsers = JSON.parse(
+        localStorage.getItem("users") ||
+          JSON.stringify([
+            {
+              email: "admin@example.com",
+              password: "password123",
+              role: "admin",
+              userId: "admin-123",
+            },
+            {
+              email: "user@example.com",
+              password: "password123",
+              role: "user",
+              userId: "user-456",
+            },
+          ])
+      );
+
       // Find matching user
-      const user = storedUsers.find(u => u.email === email && u.password === password);
-      
+      const user = storedUsers.find(
+        (u) => u.email === email && u.password === password
+      );
+
       if (user) {
         // User found, proceed with login
         const mockToken = `mock-token-${Date.now()}`;
-        
+
         // Store authentication data in localStorage for persistence
         localStorage.setItem("token", mockToken);
         localStorage.setItem("userRole", user.role);
         localStorage.setItem("userId", user.userId);
         localStorage.setItem("email", email);
-        
+
         // Create log entry for admin tracking
         const logData = {
           userId: user.userId,
@@ -99,21 +119,29 @@ const Login = () => {
           action: "login",
           loginTime: new Date().toISOString(),
           ipAddress: "127.0.0.1", // In production, this would be captured from the request
-          tokenName: mockToken.substring(0, 10) + "..." // Truncated for security
+          tokenName: mockToken.substring(0, 10) + "...", // Truncated for security
         };
-        
+
         // Store login logs in localStorage for admin view
-        const existingLogs = JSON.parse(localStorage.getItem('userLogs') || '[]');
+        const existingLogs = JSON.parse(
+          localStorage.getItem("userLogs") || "[]"
+        );
         existingLogs.push(logData);
-        localStorage.setItem('userLogs', JSON.stringify(existingLogs));
-        
+        localStorage.setItem("userLogs", JSON.stringify(existingLogs));
+
         console.log("User login:", logData);
-        
+
         // Update authentication context
         login(email);
-        
+
         // Navigate to appropriate dashboard or requested page
-        navigate(from !== "/" ? from : (user.role === "admin" ? "/admin/dashboard" : "/user/dashboard"));
+        navigate(
+          from !== "/"
+            ? from
+            : user.role === "admin"
+              ? "/admin/dashboard"
+              : "/user/dashboard"
+        );
       } else {
         // Invalid credentials
         setError("Invalid email or password");
@@ -136,9 +164,15 @@ const Login = () => {
 
         {/* Error display with animation */}
         {error && (
-          <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-6 rounded animate-pulse" role="alert">
+          <div
+            className="bg-red-50 border-l-4 border-red-500 p-4 mb-6 rounded animate-pulse"
+            role="alert"
+          >
             <div className="flex items-center">
-              <FaExclamationCircle className="text-red-500 mr-2" aria-hidden="true" />
+              <FaExclamationCircle
+                className="text-red-500 mr-2"
+                aria-hidden="true"
+              />
               <p className="text-red-500 text-sm">{error}</p>
             </div>
           </div>
@@ -148,7 +182,12 @@ const Login = () => {
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Email field */}
           <div>
-            <label htmlFor="email" className="block text-gray-700 text-sm font-medium mb-1">Email</label>
+            <label
+              htmlFor="email"
+              className="block text-gray-700 text-sm font-medium mb-1"
+            >
+              Email
+            </label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <FaEnvelope className="text-gray-400" aria-hidden="true" />
@@ -169,7 +208,12 @@ const Login = () => {
 
           {/* Password field */}
           <div>
-            <label htmlFor="password" className="block text-gray-700 text-sm font-medium mb-1">Password</label>
+            <label
+              htmlFor="password"
+              className="block text-gray-700 text-sm font-medium mb-1"
+            >
+              Password
+            </label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <FaLock className="text-gray-400" aria-hidden="true" />
@@ -221,7 +265,9 @@ const Login = () => {
             </span>
           </div>
           <div>
-            <span className="text-gray-600 text-sm">Don't have an account? </span>
+            <span className="text-gray-600 text-sm">
+              Don't have an account?{" "}
+            </span>
             <Link
               to="/signup"
               state={{ role }}
